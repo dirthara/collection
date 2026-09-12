@@ -22,10 +22,14 @@ advisory crediting the reporter unless they prefer otherwise.
 
 ## Scope
 
-This repository currently contains package infrastructure and no collection
-implementation. Report security issues in this package's code or development
-configuration. As collection behaviour is introduced, update this policy with
-its security boundaries.
+Report security issues in collection operations, exception handling, or the
+development configuration. Collection values are not included in missing-key
+exception messages or context; the missing key is included for diagnosis.
+
+Immutable collections protect their entries from replacement or removal through
+the API. They do not freeze stored objects or deep-copy nested references.
+Collections do not sanitize values, enforce authorization, or validate entity
+types. Applications remain responsible for those boundaries.
 
 Bugs in PHP or third-party dependencies should also be reported upstream.
 Application code and the sensitivity of data an application chooses to store

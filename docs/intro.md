@@ -2,14 +2,15 @@
 id: intro
 title: Dirthara Collection
 sidebar_position: 1
-description: Status and scope of the Dirthara Collection package.
+description: Mutable and immutable keyed collections for the Dirthara framework.
 ---
 
-Collections for the Dirthara framework.
+Dirthara Collection provides mutable and immutable collections with integer or
+string keys and insertion order. Both implement a shared read-only contract;
+child contracts describe their mutation or replacement methods.
 
-:::note
-The package is an initial scaffold. There is no public collection API or
-published release yet. API documentation will accompany its implementation.
-:::
+The API focuses on storing, accessing, and traversing values. Persistence,
+query building, grouping, and entity-specific rules belong to consumers.
 
-See [installation](installation.md) for requirements and development setup.
+See [installation](installation.md) for requirements and
+[collections](collections.md) for the API and examples.

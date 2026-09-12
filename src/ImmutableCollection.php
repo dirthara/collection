@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dirthara\Collection;
 
-use Dirthara\Collection\Exception\CollectionException;
 use Dirthara\Collection\Contract\ImmutableCollection as ImmutableCollectionContract;
 
 /**
@@ -17,6 +16,14 @@ use Dirthara\Collection\Contract\ImmutableCollection as ImmutableCollectionContr
 final class ImmutableCollection extends Collection implements ImmutableCollectionContract
 {
     /**
+     * @param iterable<TKey, TValue> $items
+     */
+    public function __construct(iterable $items = [])
+    {
+        parent::__construct($items);
+    }
+
+    /**
      * @param TKey $key
      * @param TValue $value
      *
@@ -24,7 +31,10 @@ final class ImmutableCollection extends Collection implements ImmutableCollectio
      */
     public function with(int|string $key, mixed $value): self
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        $collection = clone $this;
+        $collection->items[$key] = $value;
+
+        return $collection;
     }
 
     /**
@@ -34,7 +44,10 @@ final class ImmutableCollection extends Collection implements ImmutableCollectio
      */
     public function without(int|string $key): self
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        $collection = clone $this;
+        unset($collection->items[$key]);
+
+        return $collection;
     }
 
     /**
@@ -42,6 +55,6 @@ final class ImmutableCollection extends Collection implements ImmutableCollectio
      */
     public function toMutable(): MutableCollection
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return new MutableCollection($this->items);
     }
 }

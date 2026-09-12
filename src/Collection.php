@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace Dirthara\Collection;
 
 use Traversable;
-use Dirthara\Collection\Exception\CollectionException;
+use ArrayIterator;
 use Dirthara\Collection\Exception\KeyNotFoundException;
 use Dirthara\Collection\Contract\Collection as CollectionContract;
+
+use function count;
+use function in_array;
+use function array_keys;
+use function array_values;
+use function array_key_exists;
 
 /**
  * @template TKey of array-key
@@ -18,21 +24,28 @@ use Dirthara\Collection\Contract\Collection as CollectionContract;
 abstract class Collection implements CollectionContract
 {
     /**
+     * @var array<TKey, TValue>
+     */
+    protected array $items = [];
+
+    /**
      * @param iterable<TKey, TValue> $items
      */
     public function __construct(iterable $items = [])
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        foreach ($items as $key => $value) {
+            $this->items[$key] = $value;
+        }
     }
 
     public function count(): int
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return count($this->items);
     }
 
     public function isEmpty(): bool
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return $this->items === [];
     }
 
     /**
@@ -40,7 +53,7 @@ abstract class Collection implements CollectionContract
      */
     public function has(int|string $key): bool
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return array_key_exists($key, $this->items);
     }
 
     /**
@@ -52,12 +65,19 @@ abstract class Collection implements CollectionContract
      */
     public function get(int|string $key): mixed
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        if (!$this->has($key)) {
+            throw new KeyNotFoundException('Collection key does not exist.', context: [
+                'operation' => 'get',
+                'key' => $key,
+            ]);
+        }
+
+        return $this->items[$key];
     }
 
     public function contains(mixed $value): bool
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return in_array($value, $this->items, strict: true);
     }
 
     /**
@@ -65,7 +85,7 @@ abstract class Collection implements CollectionContract
      */
     public function keys(): array
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return array_keys($this->items);
     }
 
     /**
@@ -73,7 +93,7 @@ abstract class Collection implements CollectionContract
      */
     public function values(): array
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return array_values($this->items);
     }
 
     /**
@@ -81,7 +101,7 @@ abstract class Collection implements CollectionContract
      */
     public function toArray(): array
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return $this->items;
     }
 
     /**
@@ -89,6 +109,6 @@ abstract class Collection implements CollectionContract
      */
     public function getIterator(): Traversable
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return new ArrayIterator($this->items);
     }
 }

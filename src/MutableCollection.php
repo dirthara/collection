@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dirthara\Collection;
 
-use Dirthara\Collection\Exception\CollectionException;
 use Dirthara\Collection\Contract\MutableCollection as MutableCollectionContract;
 
 /**
@@ -17,12 +16,20 @@ use Dirthara\Collection\Contract\MutableCollection as MutableCollectionContract;
 final class MutableCollection extends Collection implements MutableCollectionContract
 {
     /**
+     * @param iterable<TKey, TValue> $items
+     */
+    public function __construct(iterable $items = [])
+    {
+        parent::__construct($items);
+    }
+
+    /**
      * @param TKey $key
      * @param TValue $value
      */
     public function set(int|string $key, mixed $value): void
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        $this->items[$key] = $value;
     }
 
     /**
@@ -30,12 +37,18 @@ final class MutableCollection extends Collection implements MutableCollectionCon
      */
     public function remove(int|string $key): bool
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        if (!$this->has($key)) {
+            return false;
+        }
+
+        unset($this->items[$key]);
+
+        return true;
     }
 
     public function clear(): void
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        $this->items = [];
     }
 
     /**
@@ -43,7 +56,7 @@ final class MutableCollection extends Collection implements MutableCollectionCon
      */
     public function copy(): self
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return clone $this;
     }
 
     /**
@@ -51,6 +64,6 @@ final class MutableCollection extends Collection implements MutableCollectionCon
      */
     public function toImmutable(): ImmutableCollection
     {
-        throw new CollectionException('Collection API is not implemented yet.');
+        return new ImmutableCollection($this->items);
     }
 }

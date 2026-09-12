@@ -4,9 +4,9 @@
 
 # Dirthara Collection
 
-Collections for the Dirthara framework. This repository is the initial package
-scaffold; no collection API or release is available yet. Usage documentation
-lives in [`docs`](docs), prepared for the shared Docusaurus documentation site.
+Mutable and immutable keyed collections for the Dirthara framework. Usage
+documentation lives in [`docs`](docs), prepared for the shared Docusaurus
+documentation site.
 
 ## Installation
 
@@ -49,10 +49,8 @@ docker compose exec php composer test
 Tests belong in `tests`, under `Dirthara\Collection\Tests`. Source belongs in
 `src`, under `Dirthara\Collection`.
 
-The initial scaffold has no PHP source or tests. Test and coverage commands
-explicitly report that checks are not applicable while both directories contain
-no PHP files. As soon as either contains PHP files, PHPUnit and the coverage
-gate run normally; an empty test suite fails.
+The unit suite covers shared read operations, mutable updates, immutable
+replacements, copy isolation, object identity, key ordering, and exceptions.
 
 Xdebug is inactive by default. The coverage command enables it for that run:
 
