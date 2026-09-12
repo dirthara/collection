@@ -85,7 +85,10 @@ docker compose exec php composer cs
 
 `composer mago` runs every Mago check even if one fails. `composer cs` modifies
 files, including potentially unsafe lint fixes; review its changes.
-`mago.toml` requires strict types and sorts imports by length within each type.
+`mago.toml` requires strict types and preserves import order. `composer fmt`
+and `composer cs` sort imports by full statement length, including aliases,
+within each type. `composer fmt-check` and CI check this ordering. Imports with
+comments are kept in place; grouped imports are expanded by Mago before sorting.
 
 The separate Mago service can also run without starting PHP:
 

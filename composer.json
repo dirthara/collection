@@ -30,8 +30,14 @@
     },
     "scripts": {
         "mago": "sh scripts/mago.sh",
-        "fmt": "mago fmt",
-        "fmt-check": "mago fmt --check",
+        "fmt": [
+            "mago fmt",
+            "@imports"
+        ],
+        "fmt-check": [
+            "mago fmt --check",
+            "@imports-check"
+        ],
         "lint": "mago lint",
         "lint-fix": "mago lint --fix --potentially-unsafe",
         "analyze": "mago analyze",
@@ -40,13 +46,17 @@
         "test-coverage": "XDEBUG_MODE=coverage sh scripts/when-source-exists.sh phpunit --coverage-clover=build/coverage/clover.xml",
         "coverage": "sh scripts/when-source-exists.sh php scripts/coverage.php build/coverage/clover.xml 100",
         "cs": [
-            "@fmt",
-            "@lint-fix"
+            "@lint-fix",
+            "@fmt"
         ],
         "ci": [
             "@mago",
+            "@test-tools",
             "@test-coverage",
             "@coverage"
-        ]
+        ],
+        "imports": "@php scripts/sort-imports.php",
+        "imports-check": "@php scripts/sort-imports.php --check",
+        "test-tools": "@php scripts/tests/sort-imports.php"
     }
 }

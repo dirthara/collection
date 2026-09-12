@@ -5,7 +5,7 @@ paths = ["src", "tests"]
 includes = ["vendor"]
 
 [formatter]
-sort-uses = "length-ascending"
+sort-uses = "preserve"
 separate-use-types = true
 expand-use-groups = true
 

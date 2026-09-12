@@ -38,6 +38,14 @@ jobs:
       - name: Check formatting
         run: LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) docker compose run --rm mago fmt --check
 
+      - name: Test import sorter
+        if: ${{ !cancelled() }}
+        run: composer test-tools
+
+      - name: Check import ordering
+        if: ${{ !cancelled() }}
+        run: composer imports-check
+
       - name: Lint
         if: ${{ !cancelled() }}
         run: LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) docker compose run --rm mago lint
