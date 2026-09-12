@@ -1,0 +1,52 @@
+{
+    "name": "dirthara/collection",
+    "description": "Collections for the Dirthara framework",
+    "type": "library",
+    "require": {
+        "php": "^8.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Dirthara\\Collection\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dirthara\\Collection\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Dirthara"
+        }
+    ],
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "mago": "sh scripts/mago.sh",
+        "fmt": "mago fmt",
+        "fmt-check": "mago fmt --check",
+        "lint": "mago lint",
+        "lint-fix": "mago lint --fix --potentially-unsafe",
+        "analyze": "mago analyze",
+        "guard": "mago guard",
+        "test": "sh scripts/when-source-exists.sh phpunit",
+        "test-coverage": "XDEBUG_MODE=coverage sh scripts/when-source-exists.sh phpunit --coverage-clover=build/coverage/clover.xml",
+        "coverage": "sh scripts/when-source-exists.sh php scripts/coverage.php build/coverage/clover.xml 100",
+        "cs": [
+            "@fmt",
+            "@lint-fix"
+        ],
+        "ci": [
+            "@mago",
+            "@test-coverage",
+            "@coverage"
+        ]
+    }
+}
