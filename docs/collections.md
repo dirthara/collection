@@ -1,132 +1,100 @@
 ---
 id: collections
-title: Collections
-sidebar_position: 3
-description: Construct, read, mutate, and copy keyed collections.
+title: Shared collection API
+sidebar_label: Shared API
+sidebar_position: 4
+description: Construction, key semantics, lookup, membership, iteration, and array exports.
 ---
 
-## Construction and keys
+Both concrete collections implement `Dirthara\Collection\Contract\Collection`.
+The shared abstract class `Dirthara\Collection\Collection` supplies their
+array-backed read behavior; it cannot be instantiated directly.
 
-Both `MutableCollection` and `ImmutableCollection` accept an iterable of values
-keyed by integers or strings. The default is an empty collection. Generators
-are consumed once during construction; later reads do not revisit them.
+## Construction and keys
 
 | Parameter | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `items` | `iterable<TKey, TValue>` | `[]` | Initial entries, copied in iteration order. |
 
-The last value for a duplicate key wins, preserving that key's original
-position. Keys follow PHP array rules: `'42'` and `42` identify the same entry,
-while `'042'` remains a distinct string key. Numeric keys are not reindexed.
+`TKey` is an integer or string; `TValue` can be any PHP value. The empty default
+lets callers start building a collection without supplying an array.
+
+Construction eagerly consumes an iterable once. The collection stores its own
+entries and does not revisit the producer when read or iterated later.
+Passing a generator therefore does not make the collection lazy.
+
+When an iterable produces a duplicate key, its last value wins and the key keeps
+its original position. Numeric keys are preserved rather than reindexed.
 
 ```php
-use Dirthara\Collection\MutableCollection;
+use Dirthara\Collection\ImmutableCollection;
 
-$collection = new MutableCollection(['first' => 'Ada', 10 => 'Lin']);
-$value = $collection->get('first');
+function entries(): Generator
+{
+    yield 'first' => 'Ada';
+    yield 10 => 'Lin';
+    yield 'first' => 'Grace';
+}
+
+$names = new ImmutableCollection(entries());
+$result = $names->toArray();
 ```
 
-## Reading
+`$result` is `['first' => 'Grace', 10 => 'Lin']`.
 
-Both variants implement `Dirthara\Collection\Contract\Collection`.
+:::caution
+Keys follow PHP array semantics. The string `'42'` and the integer `42` address
+the same entry, while `'042'` remains a string key. Use consistent identifiers
+when keying collections by entity ID. Supply only integer or string keys;
+other iterable key types are outside the collection contract.
+:::
 
-| Method | Result |
-| --- | --- |
-| `count(): int` | Number of entries; also supports `count($collection)`. |
-| `isEmpty(): bool` | Whether there are no entries. |
-| `has(int\|string $key): bool` | Whether the key exists, even when its value is `null`. |
-| `get(int\|string $key): mixed` | Value at the key; throws `KeyNotFoundException` if absent. |
-| `contains(mixed $value): bool` | Strict value comparison; objects must be the same instance. |
-| `keys(): array` | List of keys in insertion order. |
-| `values(): array` | List of values in insertion order. |
-| `toArray(): array` | Array preserving keys and insertion order. |
-| `getIterator(): Traversable` | Iterator over a snapshot of the entries. |
+## Reading and membership
 
-Use `foreach` for traversal. Each call to `getIterator()` captures the current
-entries. Changes to a mutable collection after that call do not change the
-existing iterator. Exported arrays and iterators cannot replace or remove the
-collection's entries.
+| Method | Return type | Behavior |
+| --- | --- | --- |
+| `count()` | `int` | Number of entries. Also available as `count($collection)`. |
+| `isEmpty()` | `bool` | Whether there are no entries. |
+| `has(int\|string $key)` | `bool` | Whether the key exists, including an entry containing `null`. |
+| `get(int\|string $key)` | `TValue` | Value at the key; throws `KeyNotFoundException` if absent. |
+| `contains(mixed $value)` | `bool` | Whether any stored value is strictly equal to the argument. |
 
-## Mutable collections
+`has()` checks a key; `contains()` checks values. With `contains()`, `1` differs
+from `'1'` and `true`. Two distinct objects do not match even if their properties
+are equal. Arrays use PHP's strict array comparison, including value types and
+key order. Membership checking scans the stored values.
 
-`MutableCollection` implements `Contract\MutableCollection`. Its mutation
-methods change the existing collection.
+Missing keys are described in [error handling](error-handling.md).
 
-| Method | Result |
-| --- | --- |
-| `set(int\|string $key, mixed $value): void` | Insert or replace an entry. Replacement keeps its position; insertion appends. |
-| `remove(int\|string $key): bool` | Remove an entry; return whether it existed, including entries containing `null`. |
-| `clear(): void` | Remove all entries. |
-| `copy(): self` | Create an independent mutable container. |
-| `toImmutable(): ImmutableCollection` | Create an independent immutable container. |
+## Arrays and iteration
 
-Removing a key and inserting it again moves it to the end.
+| Method | Return type | Behavior |
+| --- | --- | --- |
+| `keys()` | `list<TKey>` | Keys in insertion order. |
+| `values()` | `list<TValue>` | Values in insertion order, indexed from zero. |
+| `toArray()` | `array<TKey, TValue>` | Entries with their original keys and order. |
+| `getIterator()` | `Traversable<TKey, TValue>` | Snapshot of the current entries. |
+
+Use `foreach` to iterate without explicitly requesting an iterator. Each new
+iteration sees the entries present when its iterator was created. An existing
+iterator is unaffected by later insertions, removals, or replacements in a
+mutable collection.
 
 ```php
 use Dirthara\Collection\MutableCollection;
 
 $names = new MutableCollection(['first' => 'Ada']);
+$iterator = $names->getIterator();
 $names->set('second', 'Lin');
-$snapshot = $names->toImmutable();
-$names->remove('first');
+
+$before = iterator_to_array($iterator);
+$after = $names->toArray();
 ```
 
-The snapshot still contains both entries.
+`$before` contains only `'first'`; `$after` contains both entries.
+Changing an exported array's entries does not change the collection.
+[Stored objects and nested references](operations/copying.md) remain shared.
 
-## Immutable collections
-
-`ImmutableCollection` implements `Contract\ImmutableCollection`. Replacement
-methods return a new collection and leave the receiver unchanged.
-
-| Method | Result |
-| --- | --- |
-| `with(int\|string $key, mixed $value): self` | Return a collection with the entry inserted or replaced. |
-| `without(int\|string $key): self` | Return a collection without the key. An absent key leaves the entries unchanged. |
-| `toMutable(): MutableCollection` | Create an independent mutable container. |
-
-```php
-use Dirthara\Collection\ImmutableCollection;
-
-$original = new ImmutableCollection(['first' => 'Ada']);
-$extended = $original->with('second', 'Lin');
-$remaining = $extended->without('first');
-```
-
-:::caution
-Immutability is shallow. Stored objects are shared, including across copies,
-conversions, and exported arrays or iterators. Changing an entity's properties
-is visible through every collection containing that entity. Nested PHP
-references are not deep-copied either. Use immutable values when you need a
-snapshot of their state as well as collection membership.
-:::
-
-## Typehints
-
-Use the shared contract for reading, and the appropriate child contract when
-you need mutable or immutable operations. Import conflicting names with aliases.
-
-```php
-use Dirthara\Collection\Contract\MutableCollection as MutableCollectionContract;
-
-function renameFirst(MutableCollectionContract $names, string $name): void
-{
-    $names->set('first', $name);
-}
-```
-
-The contracts and concrete classes declare `TKey` and `TValue` for static
-analysis. They do not enforce an entity class at runtime; a consuming entity
-collection can enforce its own domain rules.
-
-## Missing keys and exceptions
-
-`get()` throws `Exception\KeyNotFoundException`, which extends
-`Exception\CollectionException`. Its context contains the operation `get` and
-the missing key, without including stored values in the message or context.
-Use `has()` when absence is expected; a value of `null` is still present.
-
-The base exception accepts `message`, `code`, `previous`, and an optional
-context array. `getContext()` returns the context; `addContext()` merges new
-context and returns the same exception, replacing matching string keys.
-Exceptions do not log themselves. An application handler can pass their context
-to its logger and set the `exception` context key to the caught exception.
+Collections do not implement `ArrayAccess`: use `get()` and the appropriate
+[mutable](operations/mutable.md) or [immutable](operations/immutable.md) method
+instead of array-offset syntax.

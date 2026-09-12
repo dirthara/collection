@@ -4,13 +4,16 @@
 
 # Dirthara Collection
 
-Mutable and immutable keyed collections for the Dirthara framework. Usage
-documentation lives in [`docs`](docs), prepared for the shared Docusaurus
-documentation site.
+Mutable and immutable keyed collections for the Dirthara framework.
+
+Usage guides and API documentation live in [`docs`](docs/intro.md), starting
+with [getting started](docs/getting-started.md). An external package builds
+these Markdown pages into the shared Docusaurus site.
 
 ## Installation
 
-Requires PHP 8.5. Install it with:
+Requires PHP `^8.5` (PHP 8.5 or a later PHP 8 release), with no additional
+runtime Composer dependencies. Install with:
 
 ```sh
 composer require dirthara/collection
@@ -46,22 +49,6 @@ docker compose down
 docker compose exec php composer test
 ```
 
-Tests belong in `tests`, under `Dirthara\Collection\Tests`. Source belongs in
-`src`, under `Dirthara\Collection`.
-
-The unit suite covers shared read operations, mutable updates, immutable
-replacements, copy isolation, object identity, key ordering, and exceptions.
-
-Xdebug is inactive by default. The coverage command enables it for that run:
-
-```sh
-docker compose exec php composer test-coverage
-docker compose exec php composer coverage
-```
-
-The report is written to `build/coverage/clover.xml`. The gate requires 100%
-line coverage of `src` and lists uncovered lines.
-
 ## Code quality
 
 Run the same checks as CI:
@@ -70,29 +57,39 @@ Run the same checks as CI:
 docker compose exec php composer ci
 ```
 
-Run individual checks or apply formatting and lint fixes:
+Run individual checks:
 
 ```sh
-docker compose exec php composer mago
 docker compose exec php composer fmt-check
 docker compose exec php composer lint
 docker compose exec php composer analyze
 docker compose exec php composer guard
+```
+
+`composer mago` runs the formatting, import-order, lint, analysis, and configured
+architecture checks. `composer ci` also runs tooling tests, unit tests, and the
+coverage gate.
+
+Apply formatting and import sorting with `composer fmt`, or include automatic
+lint fixes with `composer cs`:
+
+```sh
+docker compose exec php composer fmt
 docker compose exec php composer cs
 ```
 
-`composer mago` runs every Mago check even if one fails. `composer cs` modifies
-files, including potentially unsafe lint fixes; review its changes.
-`mago.toml` requires strict types and preserves import order. `composer fmt`
-and `composer cs` sort imports by full statement length, including aliases,
-within each type. `composer fmt-check` and CI check this ordering. Imports with
-comments are kept in place; grouped imports are expanded by Mago before sorting.
+`composer cs` includes potentially unsafe lint fixes; review its changes.
 
-The separate Mago service can also run without starting PHP:
+Run coverage separately with:
 
 ```sh
-LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) docker compose run --rm mago fmt --check
+docker compose exec php composer test-coverage
+docker compose exec php composer coverage
 ```
+
+Xdebug is inactive by default and enabled for the coverage run. The report is
+written to `build/coverage/clover.xml`. The gate requires 100% line coverage of
+`src` and lists uncovered lines.
 
 ## Contributing
 

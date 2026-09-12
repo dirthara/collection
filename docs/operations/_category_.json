@@ -1,0 +1,8 @@
+{
+  "label": "Updating and copying",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Choose mutable updates or immutable replacements, and understand what copies share."
+  }
+}

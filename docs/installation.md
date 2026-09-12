@@ -2,26 +2,38 @@
 id: installation
 title: Installation
 sidebar_position: 2
-description: Requirements and installation status for Dirthara Collection.
+description: PHP requirements, Composer installation, and autoloading.
 ---
 
 ## Requirements
 
-PHP 8.5 or later within the PHP 8 series is required. The package has no runtime
-Composer dependencies beyond PHP.
+The package requires PHP `^8.5`: PHP 8.5 or a later PHP 8 release. It has no
+additional runtime Composer dependencies or database requirements.
 
-## Package installation
+## Install with Composer
 
-Once published, install the package using Composer:
+For a published release, run:
 
 ```sh
 composer require dirthara/collection
 ```
 
-:::caution
-There is no published release yet. The command above describes the intended
-installation after publication.
+Composer installs the package and registers the `Dirthara\Collection` namespace
+with its autoloader. In a standalone application, load that autoloader before
+using the package. Framework applications commonly load it during bootstrap.
+
+```php
+require 'vendor/autoload.php';
+
+use Dirthara\Collection\MutableCollection;
+
+$names = new MutableCollection(['first' => 'Ada']);
+```
+
+:::note
+The Composer command requires a release to be available in your configured
+repositories. To work from a local checkout before publication, configure a
+Composer path repository in the consuming application.
 :::
 
-For development, follow the Docker and Composer setup in the repository's
-[README](../README.md). Development tooling includes PHPUnit, Mago, and Xdebug.
+Continue with [getting started](getting-started.md).
