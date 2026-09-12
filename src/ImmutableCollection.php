@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dirthara\Collection;
 
+use Dirthara\Collection\Contract\MutableCollection as MutableCollectionContract;
 use Dirthara\Collection\Contract\ImmutableCollection as ImmutableCollectionContract;
 
 /**
@@ -51,9 +52,9 @@ final class ImmutableCollection extends Collection implements ImmutableCollectio
     }
 
     /**
-     * @return MutableCollection<TKey, TValue>
+     * @return MutableCollectionContract<TKey, TValue>
      */
-    public function toMutable(): MutableCollection
+    public function toMutable(): MutableCollectionContract
     {
         return new MutableCollection($this->items);
     }

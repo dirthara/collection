@@ -17,7 +17,7 @@ Updating it changes the object seen by every caller holding that same instance.
 | `remove(int\|string $key)` | `bool` | Remove the entry and report whether it existed. |
 | `clear()` | `void` | Remove all entries. |
 | `copy()` | `MutableCollection<TKey, TValue>` | Return an independent mutable container. |
-| `toImmutable()` | `ImmutableCollection<TKey, TValue>` | Return an independent immutable container. |
+| `toImmutable()` | `Contract\ImmutableCollection<TKey, TValue>` | Return an independent immutable container. |
 
 ## Insert and replace
 

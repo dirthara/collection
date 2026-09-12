@@ -15,7 +15,7 @@ Its update methods return a new collection; they do not change the receiver.
 | --- | --- | --- |
 | `with(int\|string $key, mixed $value)` | `ImmutableCollection<TKey, TValue>` | Return a collection with the entry inserted or replaced. |
 | `without(int\|string $key)` | `ImmutableCollection<TKey, TValue>` | Return a collection without the entry. |
-| `toMutable()` | `MutableCollection<TKey, TValue>` | Return an independent mutable container. |
+| `toMutable()` | `Contract\MutableCollection<TKey, TValue>` | Return an independent mutable container. |
 
 ## Use the returned collection
 

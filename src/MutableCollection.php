@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dirthara\Collection;
 
 use Dirthara\Collection\Contract\MutableCollection as MutableCollectionContract;
+use Dirthara\Collection\Contract\ImmutableCollection as ImmutableCollectionContract;
 
 /**
  * @template TKey of array-key
@@ -60,9 +61,9 @@ final class MutableCollection extends Collection implements MutableCollectionCon
     }
 
     /**
-     * @return ImmutableCollection<TKey, TValue>
+     * @return ImmutableCollectionContract<TKey, TValue>
      */
-    public function toImmutable(): ImmutableCollection
+    public function toImmutable(): ImmutableCollectionContract
     {
         return new ImmutableCollection($this->items);
     }

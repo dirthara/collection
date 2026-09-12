@@ -17,8 +17,8 @@ All contracts live under `Dirthara\Collection\Contract`.
 | `ImmutableCollection<TKey, TValue>` | Shared reads plus `with()`, `without()`, and `toMutable()`. |
 
 Both child interfaces extend the shared interface. Conversions on the contracts
-return the corresponding child contract; concrete implementations return the
-corresponding concrete class.
+return the corresponding child contract. The provided implementations return
+concrete instances that satisfy those contracts.
 
 ```php
 use Dirthara\Collection\MutableCollection;
